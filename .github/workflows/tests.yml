@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+ 
+      - name: Atualizar ubuntu
+        run: sudo apt-get update -y
 
       - name: Instalar Free Pascal
         run: sudo apt-get install -y fpc
