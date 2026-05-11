@@ -1,0 +1,46 @@
+name: FPCUnit Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Free Pascal
+        run: sudo apt-get install -y fpc
+
+      - name: Verificar versao FPC
+        run: fpc -iV
+
+      - name: Compilar test runner
+        run: |
+          fpc \
+            -Fu./tests \
+            -FE./tests \
+            ./tests/testrunner.pas
+
+      - name: Executar testes
+        run: ./tests/testrunner --all --progress > tests/results.xml 2>&1
+
+      - name: Exibir resultados
+        if: always()
+        run: cat tests/results.xml
+
+      - name: Verificar falhas
+        run: |
+          if grep -q 'Result="Failed"\|Result="Error"' tests/results.xml; then
+            echo ""
+            echo "=== TESTES COM FALHA ==="
+            grep -B1 'Result="Failed"\|Result="Error"' tests/results.xml | grep 'Name='
+            exit 1
+          fi
+          TOTAL=$(grep -oP 'NumberOfRunTests="\K[0-9]+' tests/results.xml | head -1)
+          echo "Todos os ${TOTAL} testes passaram!"

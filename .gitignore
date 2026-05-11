@@ -1,0 +1,8 @@
+# Arquivos gerados pelo Free Pascal Compiler
+tests/*.o
+tests/*.ppu
+tests/testrunner
+tests/link.res
+
+# Resultados de testes
+tests/results.xml
